@@ -1,0 +1,106 @@
+# =====================================================
+# DigitalOcean App Platform Configuration
+# Project Management System
+# =====================================================
+
+name: project-management-system
+
+# =====================================================
+# Services Configuration
+# =====================================================
+
+services:
+  # Backend API Service
+  - name: backend-api
+    source_dir: /
+    github:
+      repo: your-username/your-repo-name
+      branch: main
+    build_command: npm install
+    run_command: npm start
+    environment_slug: node-js
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    
+    # Health check configuration
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 30
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+    
+    # Environment variables
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "8080"
+      - key: JWT_SECRET
+        value: your-jwt-secret-here
+        type: SECRET
+      - key: DATABASE_URL
+        value: your-database-connection-string
+        type: SECRET
+      - key: FRONTEND_URL
+        value: https://your-app-name.ondigitalocean.app
+    
+    # HTTP configuration
+    http_port: 8080
+    
+    # Routes configuration
+    routes:
+      - path: /api
+      - path: /health
+    
+    # CORS configuration is handled in the code
+
+# =====================================================
+# Alternative: Separate Frontend + Backend
+# =====================================================
+
+# If you want to deploy frontend separately, uncomment this:
+#
+# static_sites:
+#   - name: frontend
+#     source_dir: /frontend
+#     github:
+#       repo: your-username/your-repo-name
+#       branch: main
+#     build_command: npm install && npm run build
+#     output_dir: /build
+#     environment_slug: node-js
+#     
+#     envs:
+#       - key: REACT_APP_API_URL
+#         value: https://backend-api-your-app.ondigitalocean.app/api
+#     
+#     routes:
+#       - path: /
+
+# =====================================================
+# Database Configuration
+# =====================================================
+
+# Note: Database should be created separately in DigitalOcean
+# This configuration file references it via environment variables
+
+# =====================================================
+# Deployment Configuration
+# =====================================================
+
+# Alerts (optional)
+alerts:
+  - rule: CPU_UTILIZATION
+    value: 80
+  - rule: MEM_UTILIZATION  
+    value: 80
+  - rule: RESTART_COUNT
+    value: 5
+
+# Domains (optional - add your custom domain)
+domains:
+  - domain: api.yourdomain.com
+    type: PRIMARY
+    wildcard: false
